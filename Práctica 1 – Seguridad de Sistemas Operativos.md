@@ -81,10 +81,6 @@
 | Tipo de disco | Split virtual disk into multiple files |
 | Ajuste adicional | Dispositivo Floppy eliminado en Edit virtual machine settings para evitar errores de Easy Install |
 
-**Evidencia: resumen de hardware de la máquina virtual**
-
-![Resumen de la VM](images/A1_resumen_vm.png)
-
 ### A.2 Instalación del sistema operativo
 
 | Parámetro | Configuración aplicada |
@@ -96,10 +92,6 @@
 | Reinicio | Automático al finalizar la instalación |
 | Acceso inicial | Contraseña de Administrador establecida; inicio de sesión con Ctrl derecho + Alt derecho + Insert |
 
-**Evidencia: selección de edición del sistema operativo**
-
-![Edición de Windows Server](images/A2_edicion_so.png)
-
 ### A.3 Cambio de nombre del equipo
 
 | Elemento | Detalle |
@@ -107,10 +99,6 @@
 | Ubicación | Administrador del servidor, Servidor local, nombre del equipo, Cambiar |
 | Nombre asignado | MiguelRM |
 | Acción posterior | Reinicio del servidor |
-
-**Evidencia: nombre del equipo aplicado en Servidor local**
-
-![Nombre del equipo](images/A3_nombre_equipo.png)
 
 ---
 
@@ -130,14 +118,6 @@
 | Dependencias | Características adicionales agregadas |
 | Reinicio | Reiniciar automáticamente el servidor de destino en caso necesario |
 
-**Evidencia: selección del rol AD DS**
-
-![Selección del rol AD DS](images/B1_rol_adds.png)
-
-**Evidencia: instalación finalizada**
-
-![Instalación del rol finalizada](images/B2_instalacion_rol.png)
-
 ### B.2 Promoción a controlador de dominio
 
 | Parámetro | Configuración aplicada |
@@ -152,24 +132,12 @@
 | Comprobación de requisitos previos | Superada |
 | Reinicio | Automático tras la instalación |
 
-**Evidencia: configuración del nuevo bosque**
-
-![Configuración del bosque](images/B3_nuevo_bosque.png)
-
-**Evidencia: comprobación de requisitos previos superada**
-
-![Requisitos previos](images/B4_requisitos_previos.png)
-
 ### B.3 Verificación del dominio
 
 | Verificación | Resultado |
 |---|---|
 | Ubicación | Administrador del servidor, Servidor local |
 | Dominio mostrado | `MiguelRM.local` |
-
-**Evidencia: dominio visible en Servidor local**
-
-![Dominio verificado](images/B5_dominio_verificado.png)
 
 ---
 
@@ -188,10 +156,6 @@
 | DNS preferido | IP del servidor (ej.: 192.168.0.10, verificada con `ipconfig`) |
 | DNS alternativo | 8.8.8.8 |
 
-**Evidencia: configuración DNS del adaptador**
-
-![Configuración DNS](images/C1_dns_cliente.png)
-
 ### C.2 Unión al dominio
 
 | Parámetro | Configuración aplicada |
@@ -203,20 +167,12 @@
 | Resultado | Mensaje de unión correcta al dominio `MiguelRM.local` |
 | Acción posterior | Reinicio del equipo cliente |
 
-**Evidencia: mensaje de unión exitosa al dominio**
-
-![Unión al dominio](images/C2_union_dominio.png)
-
 ### C.3 Verificación del inicio de sesión
 
 | Verificación | Resultado |
 |---|---|
 | Pantalla de inicio de sesión | Opción Otro usuario disponible |
 | Dominio de inicio de sesión | MIGUELRM |
-
-**Evidencia: inicio de sesión con el dominio MIGUELRM**
-
-![Inicio de sesión en el dominio](images/C3_login_dominio.png)
 
 ---
 
