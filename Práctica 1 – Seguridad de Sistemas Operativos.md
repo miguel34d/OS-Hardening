@@ -1,169 +1,240 @@
 <div align="center">
 
-# 🔐 Práctica 1 – Seguridad de Sistemas Operativos
+# Práctica 1 - Seguridad de Sistemas Operativos
 
-**Instituto Tecnológico de Las Américas (ITLA)**
+**Evidencia de implementación: Windows Server 2022 con Active Directory y cliente Windows 10**
 
-| Campo | Detalle |
-|---|---|
-| **Materia** | Seguridad de Sistemas Operativos |
-| **Instructor** | Juan Alexander Ramírez |
-| **Autores** | Neury Montero Mejia & Miguel Ramirez Meli |
-| **Fecha** | 25-01-2026 |
+![Instituto](https://img.shields.io/badge/Instituto-ITLA-0A3D91?style=for-the-badge)
+![Carrera](https://img.shields.io/badge/Carrera-Seguridad_Inform%C3%A1tica-1F6FEB?style=for-the-badge)
+![Matricula](https://img.shields.io/badge/Matr%C3%ADcula-20251367-2EA043?style=for-the-badge)
+
+![Windows Server](https://img.shields.io/badge/Windows_Server-2022_Standard_Evaluation-0078D4?style=flat-square&logo=windows&logoColor=white)
+![Windows 10](https://img.shields.io/badge/Cliente-Windows_10_Pro-00A4EF?style=flat-square&logo=windows10&logoColor=white)
+![VMware](https://img.shields.io/badge/Hipervisor-VMware_Workstation_Pro_17-607078?style=flat-square&logo=vmware&logoColor=white)
+![Active Directory](https://img.shields.io/badge/Servicio-Active_Directory_DS-F25022?style=flat-square)
+![Dominio](https://img.shields.io/badge/Dominio-MiguelRM.local-5C2D91?style=flat-square)
+![Estado](https://img.shields.io/badge/Estado-Completado-2EA043?style=flat-square)
 
 </div>
 
 ---
 
-## 📋 Tabla de Contenido
+## Datos generales
 
-- [🖥️ Punto A – Instalar Windows Server 2022 en VMware](#punto-a--instalar-windows-server-2022-en-vmware)
-- [🏛️ Punto B – Activar Active Directory y configurar el dominio](#punto-b--activar-active-directory-y-configurar-el-dominio)
-- [💻 Punto C – Unir un cliente Windows 10 al dominio](#punto-c--unir-un-cliente-windows-10-al-dominio)
-
----
-
-## 🖥️ Punto A – Instalar Windows Server 2022 en VMware
-
-1. Abrir **VMware Workstation Pro** desde el escritorio.
-
-2. En la pantalla de inicio, hacer clic en **"Create a New Virtual Machine"**.
-
-3. En el asistente, dejar seleccionada la opción **"Typical (recommended)"** y hacer clic en **Siguiente**.
-
-4. Seleccionar **"Installer disc image file (ISO)"** y hacer clic en **Browse** para buscar la imagen ISO de Windows Server.
-
-5. Navegar hasta la carpeta donde se descargó la ISO (`SERVER_EVAL_x64FRE_es-es.iso`) y hacer clic en **Abrir**.
-
-6. VMware detectará automáticamente la versión (**Windows Server 2022**) y activará el **Easy Install**. Hacer clic en **Siguiente**.
-
-7. En la pantalla de Easy Install, hacer clic en **Siguiente** sin llenar la clave de producto. Cuando aparezca el aviso, seleccionar **Yes**.
-
-8. Asignar un nombre a la máquina virtual (ej.: `MiguelRM`) y hacer clic en **Siguiente**.
-
-9. Configurar el tamaño del disco (recomendado: **60 GB**) y seleccionar **"Split virtual disk into multiple files"** para mayor resiliencia. Hacer clic en **Siguiente**.
-
-10. Revisar el resumen de hardware. Si se necesitan más recursos, hacer clic en **"Customize Hardware"**. Luego hacer clic en **Finish**.
-
-11. Antes de encender la VM, ir a **"Edit virtual machine settings"**, seleccionar el dispositivo **Floppy** y hacer clic en **Remove**. Confirmar con **OK**.
-
-> ⚠️ **Importante:** Este paso es necesario para evitar errores durante la instalación por el Easy Install.
-
-12. Hacer clic en **"Power on this virtual machine"** para iniciar la instalación.
-
-13. Cuando aparezca `"Press any key to boot from CD or DVD..."`, presionar **Enter** lo más rápido posible.
-
-14. Seleccionar el idioma de instalación (Español) y hacer clic en **Siguiente**.
-
-15. Hacer clic en **"Instalar ahora"**.
-
-16. Seleccionar la edición del sistema operativo. Para interfaz gráfica, elegir la **2.ª opción** (`Windows Server 2022 Standard Evaluation – Experiencia de escritorio`). Hacer clic en **Siguiente**.
-
-17. Aceptar los términos y condiciones. Hacer clic en **Siguiente**.
-
-18. Seleccionar **"Personalizar: instalar solo el sistema operativo"**.
-
-19. Seleccionar la partición disponible (60 GB sin asignar) y hacer clic en **Siguiente**.
-
-20. Esperar a que finalice la instalación. El servidor se reiniciará automáticamente.
-
-21. Establecer una contraseña para el Administrador y hacer clic en **Finalizar**.
-
-22. Para iniciar sesión, usar la combinación: `Ctrl derecho + Alt derecho + Insert`.
-
-23. Ingresar la contraseña configurada.
-
-24. Una vez dentro, cambiar el nombre del equipo:
-    - Ir a **Servidor local** en el Administrador del servidor.
-    - Hacer clic en el nombre del equipo.
-    - Seleccionar **Cambiar**.
-    - Ingresar el nombre deseado y confirmar. Reiniciar cuando se solicite.
+| Campo | Detalle |
+|---|---|
+| **Estudiante** | Miguel Ramirez Meli |
+| **Matrícula** | 20251367 |
+| **Carrera** | Seguridad Informática |
+| **Institución** | Instituto Tecnológico de Las Américas (ITLA) |
+| **Materia** | Seguridad de Sistemas Operativos |
+| **Instructor** | Juan Alexander Ramírez |
+| **Fecha** | 25-01-2026 |
 
 ---
 
-## 🏛️ Punto B – Activar Active Directory y configurar el dominio
+## Resumen del entorno
 
-1. En el **Administrador del servidor**, hacer clic en **"Agregar roles y características"**.
-
-2. Hacer clic en **Siguiente** en la pantalla de bienvenida.
-
-3. Dejar seleccionada la opción **"Instalación basada en características o en roles"**. Hacer clic en **Siguiente**.
-
-4. Seleccionar el servidor de destino (aparece automáticamente). Hacer clic en **Siguiente**.
-
-5. En la lista de roles, marcar **"Servicios de dominio de Active Directory"**.
-
-6. Cuando aparezca el cuadro de dependencias, hacer clic en **"Agregar características"**.
-
-7. Hacer clic en **Siguiente** hasta llegar a la pantalla de Confirmación.
-
-8. Marcar la opción **"Reiniciar automáticamente el servidor de destino en caso necesario"**, confirmar con **Sí** y hacer clic en **Instalar**.
-
-9. Esperar a que finalice la instalación. Hacer clic en **Cerrar**.
-
-10. En la barra superior del Administrador del servidor, hacer clic en el ícono de **Notificaciones** (bandera con triángulo amarillo).
-
-11. Hacer clic en **"Promover este servidor a controlador de dominio"**.
-
-12. Seleccionar **"Agregar un nuevo bosque"** e ingresar el nombre de dominio raíz: `MiguelRM.local`. Hacer clic en **Siguiente**.
-
-13. En las opciones del controlador de dominio:
-    - Nivel funcional del bosque: **Windows Server 2016**
-    - Nivel funcional del dominio: **Windows Server 2016**
-    - Establecer la contraseña DSRM y hacer clic en **Siguiente**.
-
-14. En la pantalla de opciones DNS, dejar desmarcada la opción de delegación DNS. Hacer clic en **Siguiente**.
-
-15. El nombre NetBIOS se asigna automáticamente. Hacer clic en **Siguiente**.
-
-16. Continuar haciendo clic en **Siguiente** hasta la pantalla de **Comprobación de requisitos previos**.
-
-17. Si todas las comprobaciones son exitosas, hacer clic en **Instalar**.
-
-18. El servidor se reiniciará automáticamente. Al volver, el dominio estará configurado.
-
-19. Verificar en **Administrador del servidor → Servidor local** que aparezca el dominio `MiguelRM.local`.
+| Componente | Valor |
+|---|---|
+| **Hipervisor** | VMware Workstation Pro 17 |
+| **Servidor** | Windows Server 2022 Standard Evaluation (Experiencia de escritorio) |
+| **Cliente** | Windows 10 Pro |
+| **Imagen ISO** | `SERVER_EVAL_x64FRE_es-es.iso` |
+| **Nombre de la VM servidor** | MiguelRM |
+| **Disco virtual** | 60 GB (dividido en múltiples archivos) |
+| **Dominio** | `MiguelRM.local` |
+| **NetBIOS** | MIGUELRM |
+| **Nivel funcional (bosque y dominio)** | Windows Server 2016 |
+| **Nombre del equipo cliente** | WS0829 |
+| **DNS preferido del cliente** | IP del servidor (ej.: 192.168.0.10) |
+| **DNS alternativo del cliente** | 8.8.8.8 |
 
 ---
 
-## 💻 Punto C – Unir un cliente Windows 10 al dominio
+## Resumen de objetivos cumplidos
 
-1. En la VM con **Windows 10**, abrir el **Panel de Control** desde el menú inicio.
-
-2. Ir a **Redes e Internet → Centro de redes y recursos compartidos**.
-
-3. Hacer clic en **"Cambiar configuración del adaptador"**.
-
-4. Hacer clic derecho sobre **Ethernet0** y seleccionar **Propiedades**.
-
-5. Hacer doble clic en **"Protocolo de Internet versión 4 (TCP/IPv4)"**.
-
-6. Seleccionar **"Usar las siguientes direcciones de servidor DNS"**:
-   - **Servidor DNS preferido:** IP del servidor (verificar con `ipconfig` en el servidor, ej.: `192.168.0.10`)
-   - **Servidor DNS alternativo:** `8.8.8.8`
-   
-   Hacer clic en **Aceptar**.
-
-7. Abrir el **Explorador de archivos**, ir a **Este equipo**, hacer clic derecho en un espacio vacío y seleccionar **Propiedades**.
-
-8. Hacer clic en **"Cambiar configuración"**.
-
-9. En la ventana de **Propiedades del sistema**, hacer clic en **Cambiar**.
-
-10. Configurar:
-    - **Nombre del equipo:** `WS0829`
-    - **Miembro del dominio:** marcar **Dominio** e ingresar `MiguelRM.local`
-    
-    Hacer clic en **Aceptar**.
-
-11. Ingresar las credenciales del Administrador del dominio cuando se soliciten. Hacer clic en **Aceptar**.
-
-12. Aparecerá el mensaje **"Se unió correctamente al dominio MiguelRM.local"**. Hacer clic en **Aceptar**.
-
-13. Reiniciar el equipo cliente.
-
-14. Al iniciar sesión, hacer clic en **"Otro usuario"** y verificar que aparezca la opción de iniciar sesión en el dominio `MIGUELRM`.
+| Punto | Objetivo | Estado |
+|---|---|---|
+| A | Instalación de Windows Server 2022 en VMware | ![Completado](https://img.shields.io/badge/-Completado-2EA043?style=flat-square) |
+| B | Instalación de AD DS y creación del dominio | ![Completado](https://img.shields.io/badge/-Completado-2EA043?style=flat-square) |
+| C | Unión del cliente Windows 10 al dominio | ![Completado](https://img.shields.io/badge/-Completado-2EA043?style=flat-square) |
 
 ---
 
-> **Nota:** Toda la práctica fue realizada utilizando VMware Workstation Pro 17 como hipervisor, con Windows Server 2022 Standard Evaluation y Windows 10 Pro como sistemas operativos invitados.
+## Punto A - Instalación de Windows Server 2022 en VMware
+
+![Punto A](https://img.shields.io/badge/Punto-A-0078D4?style=flat-square)
+![Estado](https://img.shields.io/badge/Estado-Completado-2EA043?style=flat-square)
+
+### A.1 Creación de la máquina virtual
+
+| Parámetro | Configuración aplicada |
+|---|---|
+| Modo del asistente | Typical (recommended) |
+| Origen de instalación | Installer disc image file (ISO) |
+| Imagen utilizada | `SERVER_EVAL_x64FRE_es-es.iso` |
+| Detección de VMware | Windows Server 2022 con Easy Install activado |
+| Clave de producto | No ingresada (se aceptó el aviso con Yes) |
+| Nombre de la VM | MiguelRM |
+| Tamaño de disco | 60 GB |
+| Tipo de disco | Split virtual disk into multiple files |
+| Ajuste adicional | Dispositivo Floppy eliminado en Edit virtual machine settings para evitar errores de Easy Install |
+
+**Evidencia: resumen de hardware de la máquina virtual**
+
+![Resumen de la VM](images/A1_resumen_vm.png)
+
+### A.2 Instalación del sistema operativo
+
+| Parámetro | Configuración aplicada |
+|---|---|
+| Idioma de instalación | Español |
+| Edición | Windows Server 2022 Standard Evaluation - Experiencia de escritorio |
+| Tipo de instalación | Personalizada: instalar solo el sistema operativo |
+| Partición | 60 GB sin asignar |
+| Reinicio | Automático al finalizar la instalación |
+| Acceso inicial | Contraseña de Administrador establecida; inicio de sesión con Ctrl derecho + Alt derecho + Insert |
+
+**Evidencia: selección de edición del sistema operativo**
+
+![Edición de Windows Server](images/A2_edicion_so.png)
+
+### A.3 Cambio de nombre del equipo
+
+| Elemento | Detalle |
+|---|---|
+| Ubicación | Administrador del servidor, Servidor local, nombre del equipo, Cambiar |
+| Nombre asignado | MiguelRM |
+| Acción posterior | Reinicio del servidor |
+
+**Evidencia: nombre del equipo aplicado en Servidor local**
+
+![Nombre del equipo](images/A3_nombre_equipo.png)
+
+---
+
+## Punto B - Activación de Active Directory y configuración del dominio
+
+![Punto B](https://img.shields.io/badge/Punto-B-5C2D91?style=flat-square)
+![Estado](https://img.shields.io/badge/Estado-Completado-2EA043?style=flat-square)
+
+### B.1 Instalación del rol Servicios de dominio de Active Directory
+
+| Parámetro | Configuración aplicada |
+|---|---|
+| Herramienta | Administrador del servidor, Agregar roles y características |
+| Tipo de instalación | Instalación basada en características o en roles |
+| Servidor de destino | Servidor local |
+| Rol seleccionado | Servicios de dominio de Active Directory |
+| Dependencias | Características adicionales agregadas |
+| Reinicio | Reiniciar automáticamente el servidor de destino en caso necesario |
+
+**Evidencia: selección del rol AD DS**
+
+![Selección del rol AD DS](images/B1_rol_adds.png)
+
+**Evidencia: instalación finalizada**
+
+![Instalación del rol finalizada](images/B2_instalacion_rol.png)
+
+### B.2 Promoción a controlador de dominio
+
+| Parámetro | Configuración aplicada |
+|---|---|
+| Operación de implementación | Agregar un nuevo bosque |
+| Nombre de dominio raíz | `MiguelRM.local` |
+| Nivel funcional del bosque | Windows Server 2016 |
+| Nivel funcional del dominio | Windows Server 2016 |
+| Contraseña DSRM | Establecida |
+| Delegación DNS | No configurada |
+| Nombre NetBIOS | MIGUELRM (asignado automáticamente) |
+| Comprobación de requisitos previos | Superada |
+| Reinicio | Automático tras la instalación |
+
+**Evidencia: configuración del nuevo bosque**
+
+![Configuración del bosque](images/B3_nuevo_bosque.png)
+
+**Evidencia: comprobación de requisitos previos superada**
+
+![Requisitos previos](images/B4_requisitos_previos.png)
+
+### B.3 Verificación del dominio
+
+| Verificación | Resultado |
+|---|---|
+| Ubicación | Administrador del servidor, Servidor local |
+| Dominio mostrado | `MiguelRM.local` |
+
+**Evidencia: dominio visible en Servidor local**
+
+![Dominio verificado](images/B5_dominio_verificado.png)
+
+---
+
+## Punto C - Unión de cliente Windows 10 al dominio
+
+![Punto C](https://img.shields.io/badge/Punto-C-00A4EF?style=flat-square)
+![Estado](https://img.shields.io/badge/Estado-Completado-2EA043?style=flat-square)
+
+### C.1 Configuración de red del cliente
+
+| Parámetro | Configuración aplicada |
+|---|---|
+| Ruta | Panel de Control, Redes e Internet, Centro de redes y recursos compartidos, Cambiar configuración del adaptador |
+| Adaptador | Ethernet0 |
+| Protocolo | Protocolo de Internet versión 4 (TCP/IPv4) |
+| DNS preferido | IP del servidor (ej.: 192.168.0.10, verificada con `ipconfig`) |
+| DNS alternativo | 8.8.8.8 |
+
+**Evidencia: configuración DNS del adaptador**
+
+![Configuración DNS](images/C1_dns_cliente.png)
+
+### C.2 Unión al dominio
+
+| Parámetro | Configuración aplicada |
+|---|---|
+| Ruta | Este equipo, Propiedades, Cambiar configuración, Cambiar |
+| Nombre del equipo | WS0829 |
+| Miembro de | Dominio: `MiguelRM.local` |
+| Credenciales | Administrador del dominio |
+| Resultado | Mensaje de unión correcta al dominio `MiguelRM.local` |
+| Acción posterior | Reinicio del equipo cliente |
+
+**Evidencia: mensaje de unión exitosa al dominio**
+
+![Unión al dominio](images/C2_union_dominio.png)
+
+### C.3 Verificación del inicio de sesión
+
+| Verificación | Resultado |
+|---|---|
+| Pantalla de inicio de sesión | Opción Otro usuario disponible |
+| Dominio de inicio de sesión | MIGUELRM |
+
+**Evidencia: inicio de sesión con el dominio MIGUELRM**
+
+![Inicio de sesión en el dominio](images/C3_login_dominio.png)
+
+---
+
+## Conclusión
+
+| Aspecto | Resultado |
+|---|---|
+| Servidor | Windows Server 2022 instalado y operativo en VMware |
+| Dominio | `MiguelRM.local` creado mediante la promoción a controlador de dominio |
+| Cliente | Windows 10 (WS0829) unido correctamente al dominio |
+| Autenticación | Inicio de sesión de dominio MIGUELRM disponible en el cliente |
+
+---
+
+<div align="center">
+
+![Autor](https://img.shields.io/badge/Autor-Miguel_Ramirez_Meli-0A3D91?style=flat-square)
+![Matricula](https://img.shields.io/badge/Matr%C3%ADcula-20251367-2EA043?style=flat-square)
+![Carrera](https://img.shields.io/badge/Seguridad_Inform%C3%A1tica-ITLA-1F6FEB?style=flat-square)
+
+</div>
