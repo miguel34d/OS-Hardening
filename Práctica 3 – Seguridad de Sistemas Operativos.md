@@ -85,24 +85,55 @@
 | Virtualization Based Protection of Code Integrity | **Enabled with UEFI lock** |
 | Credential Guard Configuration | **Enabled with UEFI lock** |
 
-### A.3 Apply the GPO on the server
+### A.3 Move the client computer into the Empresa OU
 
 | Step | Where | Action |
 |---|---|---|
-| 12 | ![SERVER](https://img.shields.io/badge/-SERVER-0078D4?style=flat-square) | Open **Command Prompt (CMD)** as Administrator on the server and run `gpupdate /force`. Wait for the policy changes to apply. |
-
-### A.4 Verify Credential Guard on the client (Windows 10)
-
-| Step | Where | Action |
-|---|---|---|
-| 13 | ![CLIENT](https://img.shields.io/badge/-CLIENT-2EA043?style=flat-square) | On the **Windows 10 Pro** client VM, open **PowerShell** as Administrator. |
-| 14 | ![CLIENT](https://img.shields.io/badge/-CLIENT-2EA043?style=flat-square) | Run `Get-CimInstance -ClassName win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard` to check compatibility and the Credential Guard status. |
-| 15 | ![CLIENT](https://img.shields.io/badge/-CLIENT-2EA043?style=flat-square) | In the output, verify that `AvailableSecurityProperties` includes the values `{5, 6}`. This confirms that the hardware supports Credential Guard and that the GPO was deployed to the domain computer. |
+| 12 | ![SERVER](https://img.shields.io/badge/-SERVER-0078D4?style=flat-square) | In **Server Manager**, go to **Tools > Active Directory Users and Computers**. |
+| 13 | ![SERVER](https://img.shields.io/badge/-SERVER-0078D4?style=flat-square) | Expand `MiguelRM.local` and click the **Computers** container. Locate the client computer. |
+| 14 | ![SERVER](https://img.shields.io/badge/-SERVER-0078D4?style=flat-square) | Right-click the client computer > **Move...** > select **Empresa** > **OK** (dragging it also works). |
 
 | Note | Detail |
 |---|---|
-| Expected outcome | Credential Guard is enabled and deployed on the computers of the `MiguelRM.local` domain. |
-| Common error | If the command returns `HRESULT 0x80041013 - Provider load failure`, the client VM does not have the virtual hardware prerequisites enabled. See [Part B](#part-b). |
+| Why | The GPO uses Computer Configuration, so it only applies to computer objects inside the OU where it is linked. A user inside `Empresa` is not enough. By default, domain-joined computers stay in `Computers`, where this GPO does not apply. |
+
+### A.4 Apply the GPO
+
+| Step | Where | Action |
+|---|---|---|
+| 15 | ![SERVER](https://img.shields.io/badge/-SERVER-0078D4?style=flat-square) | Open **Command Prompt (CMD)** as Administrator on the server and run `gpupdate /force`. Wait for the policy changes to apply. |
+| 16 | ![CLIENT](https://img.shields.io/badge/-CLIENT-2EA043?style=flat-square) | On the client, open **PowerShell** as Administrator (right-click > **Run as administrator**), run `gpupdate /force` and restart the computer. |
+
+### A.5 Verify the GPO on the client (Windows 10)
+
+Option 1 - Verify that the policy was deployed (registry):
+
+| Step | Where | Action |
+|---|---|---|
+| 17 | ![CLIENT](https://img.shields.io/badge/-CLIENT-2EA043?style=flat-square) | Open **PowerShell** as Administrator and run `reg query "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeviceGuard"`. |
+| 18 | ![CLIENT](https://img.shields.io/badge/-CLIENT-2EA043?style=flat-square) | Verify the values listed in the table below. |
+
+| Registry value | Expected | Meaning |
+|---|---|---|
+| `EnableVirtualizationBasedSecurity` | `0x1` | Virtualization-based security enabled |
+| `RequirePlatformSecurityFeatures` | `0x3` | Secure Boot and DMA Protection |
+| `HypervisorEnforcedCodeIntegrity` | `0x1` | Code integrity enabled with UEFI lock |
+| `LsaCfgFlags` | `0x1` | Credential Guard enabled with UEFI lock |
+| `ConfigureSystemGuardLaunch` | `0x1` | Secure Launch enabled |
+
+Option 2 - Verify that Credential Guard is available and running (requires [Part B](#part-b)):
+
+| Step | Where | Action |
+|---|---|---|
+| 19 | ![CLIENT](https://img.shields.io/badge/-CLIENT-2EA043?style=flat-square) | In **PowerShell** as Administrator, run `Get-CimInstance -ClassName win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard` to check compatibility and the Credential Guard status. |
+| 20 | ![CLIENT](https://img.shields.io/badge/-CLIENT-2EA043?style=flat-square) | In the output, verify that `AvailableSecurityProperties` includes the values `{5, 6}`. This confirms that the hardware supports Credential Guard. |
+
+| Note | Detail |
+|---|---|
+| Expected outcome | The Credential Guard GPO is deployed on the computers of the `MiguelRM.local` domain. |
+| Error `HRESULT 0x80041013 - Provider load failure` | The client VM does not have the virtual hardware prerequisites enabled. See [Part B](#part-b). |
+| Error `Access denied` (for example in `gpresult /r /scope computer`) | PowerShell is not running as Administrator. |
+| Registry key not found or `EnableVirtualizationBasedSecurity` equal to `0x0` | Check that the path is spelled `Policies`, that the client computer is inside `Empresa`, and run `gpupdate /force` and restart. |
 
 ---
 
@@ -112,7 +143,7 @@
 
 ![Part B](https://img.shields.io/badge/Part-B-5C2D91?style=flat-square)
 
-This part documents the configuration needed in **VMware Workstation Pro 17** so that the Windows 10 Pro client VM is compatible with Credential Guard. Without these steps, the verification command of Part A fails.
+This part documents the configuration needed in **VMware Workstation Pro 17** so that the Windows 10 Pro client VM is compatible with Credential Guard. Without these steps, the `Get-CimInstance` verification of Part A (Option 2) fails.
 
 | Requirement | Detail |
 |---|---|
@@ -198,6 +229,10 @@ This part documents the configuration needed in **VMware Workstation Pro 17** so
 | 2 | ![SERVER](https://img.shields.io/badge/-SERVER-0078D4?style=flat-square) | Right-click `Empresa` > **Create a GPO in this domain, and Link it here...**. |
 | 3 | ![SERVER](https://img.shields.io/badge/-SERVER-0078D4?style=flat-square) | Name it `GPO Block USB` and click **OK**. |
 | 4 | ![SERVER](https://img.shields.io/badge/-SERVER-0078D4?style=flat-square) | Right-click the new GPO > **Edit**. |
+
+| Note | Detail |
+|---|---|
+| Requirement | The client computer must be inside the `Empresa` OU (see A.3), otherwise this GPO does not apply to it. |
 
 ### C.2 Configure the USB block
 
@@ -295,24 +330,55 @@ This part documents the configuration needed in **VMware Workstation Pro 17** so
 | Protección basada en virtualización de la integridad de código | **Habilitado con el bloqueo UEFI** |
 | Configuración de Credential Guard | **Habilitado con el bloqueo UEFI** |
 
-### A.3 Aplicar la GPO en el servidor
+### A.3 Mover el equipo cliente a la unidad organizativa Empresa
 
 | Paso | Dónde | Acción |
 |---|---|---|
-| 12 | ![SERVIDOR](https://img.shields.io/badge/-SERVIDOR-0078D4?style=flat-square) | Abrir el **Símbolo del sistema (CMD)** como Administrador en el servidor y ejecutar `gpupdate /force`. Esperar a que se apliquen los cambios de directiva. |
-
-### A.4 Verificar Credential Guard en el cliente (Windows 10)
-
-| Paso | Dónde | Acción |
-|---|---|---|
-| 13 | ![CLIENTE](https://img.shields.io/badge/-CLIENTE-2EA043?style=flat-square) | En la VM cliente con **Windows 10 Pro**, abrir **PowerShell** como Administrador. |
-| 14 | ![CLIENTE](https://img.shields.io/badge/-CLIENTE-2EA043?style=flat-square) | Ejecutar `Get-CimInstance -ClassName win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard` para verificar compatibilidad y estado de Credential Guard. |
-| 15 | ![CLIENTE](https://img.shields.io/badge/-CLIENTE-2EA043?style=flat-square) | En la salida del comando, verificar que `AvailableSecurityProperties` incluya los valores `{5, 6}`. Esto confirma que el hardware es compatible con Credential Guard y que la GPO fue desplegada al equipo del dominio. |
+| 12 | ![SERVIDOR](https://img.shields.io/badge/-SERVIDOR-0078D4?style=flat-square) | En el **Administrador del servidor**, ir a **Herramientas > Usuarios y equipos de Active Directory**. |
+| 13 | ![SERVIDOR](https://img.shields.io/badge/-SERVIDOR-0078D4?style=flat-square) | Expandir `MiguelRM.local` y hacer clic en el contenedor **Computers**. Localizar el equipo cliente. |
+| 14 | ![SERVIDOR](https://img.shields.io/badge/-SERVIDOR-0078D4?style=flat-square) | Clic derecho sobre el equipo cliente > **Mover...** > seleccionar **Empresa** > **Aceptar** (también funciona arrastrarlo). |
 
 | Nota | Detalle |
 |---|---|
-| Resultado esperado | Credential Guard queda habilitado y desplegado en los equipos del dominio `MiguelRM.local`. |
-| Error común | Si el comando devuelve `HRESULT 0x80041013 - Error en la carga del proveedor`, la VM cliente no tiene los prerrequisitos de hardware virtual habilitados. Ver el [Punto B](#punto-b). |
+| Motivo | La GPO usa Configuración del equipo, por lo que solo se aplica a los objetos de equipo que estén dentro de la unidad organizativa donde está vinculada. Un usuario dentro de `Empresa` no es suficiente. Por defecto, los equipos unidos al dominio quedan en `Computers`, donde esta GPO no se aplica. |
+
+### A.4 Aplicar la GPO
+
+| Paso | Dónde | Acción |
+|---|---|---|
+| 15 | ![SERVIDOR](https://img.shields.io/badge/-SERVIDOR-0078D4?style=flat-square) | Abrir el **Símbolo del sistema (CMD)** como Administrador en el servidor y ejecutar `gpupdate /force`. Esperar a que se apliquen los cambios de directiva. |
+| 16 | ![CLIENTE](https://img.shields.io/badge/-CLIENTE-2EA043?style=flat-square) | En el cliente, abrir **PowerShell** como Administrador (clic derecho > **Ejecutar como administrador**), ejecutar `gpupdate /force` y reiniciar el equipo. |
+
+### A.5 Verificar la GPO en el cliente (Windows 10)
+
+Opción 1 - Verificar que la política fue desplegada (registro):
+
+| Paso | Dónde | Acción |
+|---|---|---|
+| 17 | ![CLIENTE](https://img.shields.io/badge/-CLIENTE-2EA043?style=flat-square) | Abrir **PowerShell** como Administrador y ejecutar `reg query "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeviceGuard"`. |
+| 18 | ![CLIENTE](https://img.shields.io/badge/-CLIENTE-2EA043?style=flat-square) | Verificar los valores de la tabla siguiente. |
+
+| Valor del registro | Esperado | Significado |
+|---|---|---|
+| `EnableVirtualizationBasedSecurity` | `0x1` | Seguridad basada en virtualización habilitada |
+| `RequirePlatformSecurityFeatures` | `0x3` | Arranque seguro y protección de DMA |
+| `HypervisorEnforcedCodeIntegrity` | `0x1` | Integridad de código habilitada con bloqueo UEFI |
+| `LsaCfgFlags` | `0x1` | Credential Guard habilitado con bloqueo UEFI |
+| `ConfigureSystemGuardLaunch` | `0x1` | Secure Launch habilitado |
+
+Opción 2 - Verificar que Credential Guard está disponible y en ejecución (requiere el [Punto B](#punto-b)):
+
+| Paso | Dónde | Acción |
+|---|---|---|
+| 19 | ![CLIENTE](https://img.shields.io/badge/-CLIENTE-2EA043?style=flat-square) | En **PowerShell** como Administrador, ejecutar `Get-CimInstance -ClassName win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard` para verificar compatibilidad y estado de Credential Guard. |
+| 20 | ![CLIENTE](https://img.shields.io/badge/-CLIENTE-2EA043?style=flat-square) | En la salida del comando, verificar que `AvailableSecurityProperties` incluya los valores `{5, 6}`. Esto confirma que el hardware es compatible con Credential Guard. |
+
+| Nota | Detalle |
+|---|---|
+| Resultado esperado | La GPO de Credential Guard queda desplegada en los equipos del dominio `MiguelRM.local`. |
+| Error `HRESULT 0x80041013 - Error en la carga del proveedor` | La VM cliente no tiene los prerrequisitos de hardware virtual habilitados. Ver el [Punto B](#punto-b). |
+| Error `Acceso denegado` (por ejemplo en `gpresult /r /scope computer`) | PowerShell no está abierto como Administrador. |
+| Clave de registro no encontrada o `EnableVirtualizationBasedSecurity` en `0x0` | Verificar que la ruta esté escrita `Policies`, que el equipo cliente esté dentro de `Empresa`, y ejecutar `gpupdate /force` y reiniciar. |
 
 ---
 
@@ -322,7 +388,7 @@ This part documents the configuration needed in **VMware Workstation Pro 17** so
 
 ![Punto B](https://img.shields.io/badge/Punto-B-5C2D91?style=flat-square)
 
-Este punto documenta la configuración necesaria en **VMware Workstation Pro 17** para que la VM cliente con Windows 10 Pro sea compatible con Credential Guard. Sin estos pasos, el comando de verificación del Punto A falla.
+Este punto documenta la configuración necesaria en **VMware Workstation Pro 17** para que la VM cliente con Windows 10 Pro sea compatible con Credential Guard. Sin estos pasos, la verificación con `Get-CimInstance` del Punto A (Opción 2) falla.
 
 | Requisito | Detalle |
 |---|---|
@@ -408,6 +474,10 @@ Este punto documenta la configuración necesaria en **VMware Workstation Pro 17*
 | 2 | ![SERVIDOR](https://img.shields.io/badge/-SERVIDOR-0078D4?style=flat-square) | Clic derecho sobre `Empresa` > **Crear un GPO en este dominio y vincularlo aquí...**. |
 | 3 | ![SERVIDOR](https://img.shields.io/badge/-SERVIDOR-0078D4?style=flat-square) | Asignar el nombre `GPO Block USB` y hacer clic en **Aceptar**. |
 | 4 | ![SERVIDOR](https://img.shields.io/badge/-SERVIDOR-0078D4?style=flat-square) | Clic derecho sobre la GPO recién creada > **Editar**. |
+
+| Nota | Detalle |
+|---|---|
+| Requisito | El equipo cliente debe estar dentro de la unidad organizativa `Empresa` (ver A.3), de lo contrario esta GPO no se le aplica. |
 
 ### C.2 Configurar el bloqueo de USB
 
